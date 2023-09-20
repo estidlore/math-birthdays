@@ -22,7 +22,7 @@
     <script src="https://kit.fontawesome.com/f59a23bc6b.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script>
-      const datePicker = () => {
+      const datePicker = ({ onChange }) => {
         const months = [
           "January",
           "February",
@@ -50,6 +50,7 @@
         date.setHours(0, 0, 0, 0);
         const d = new Date(date);
         let daysCount = 0;
+        let picking = "day"; // {day, month, year}
 
         const container = $("<div/>", {
           class: "p-2",
@@ -88,7 +89,26 @@
           })
         );
 
+        const deselectDay = () => {
+          btnsDays[date.getDate() - 1].removeClass("bg-secondary");
+        };
+        const selectDay = () => {
+          if (
+            d.getMonth() === date.getMonth() &&
+            d.getFullYear() === date.getFullYear()
+          ) {
+            btnsDays[date.getDate() - 1].addClass("bg-secondary");
+          }
+        };
+
+        const updateDate = () => {
+          deselectDay();
+          date.setTime(d.getTime());
+          onChange(date);
+          selectDay();
+        };
         const updateMonth = () => {
+          deselectDay();
           const newCount = new Date(
             d.getFullYear(),
             d.getMonth() + 1,
@@ -105,7 +125,33 @@
           const offset = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
           gapDays.css("width", `${(100 / 7) * offset}%`);
           btnHeading.text(`${months[d.getMonth()]} ${d.getFullYear()}`);
+          selectDay();
         };
+
+        const setDay = (day) => {
+          d.setDate(day);
+          updateDate();
+        };
+        const setMonth = (newMonth) => {
+          d.setMonth(newMonth);
+          updateMonth();
+        };
+
+        btnPrev.click(() => {
+          if (picking === "day") {
+            setMonth(d.getMonth() - 1);
+          }
+        });
+        btnNext.click(() => {
+          if (picking === "day") {
+            setMonth(d.getMonth() + 1);
+          }
+        });
+        btnsDays.forEach((el, id) => {
+          el.click(() => {
+            setDay(id + 1);
+          });
+        });
 
         divHeader.append(btnPrev, btnHeading, btnNext);
         divDays.append(txtDays, gapDays);
@@ -117,7 +163,7 @@
     <script>
       $(document).ready(() => {
         const pickerWrapper = $("#datepicker");
-        const picker = datePicker();
+        const picker = datePicker({ onChange: console.log });
         pickerWrapper.append(picker);
       });
     </script>
