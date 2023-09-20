@@ -15,6 +15,7 @@
   <body class="bg-dark min-vh-100 text-light">
     <div class="align-items-center d-flex flex-column p-2">
       <p class="h1 fw-bold">Math Birthdays</p>
+      <p class="fs-5 mb-0">Pick your birthdate</p>
       <div id="datepicker"></div>
       <p class="mb-2" id="birthday"></p>
       <p class="text-center" id="math-birthday"></p>
@@ -285,7 +286,41 @@
     <script>
       $(document).ready(() => {
         const pickerWrapper = $("#datepicker");
-        const picker = datePicker({ onChange: console.log });
+        const birthdate = $("#birthday");
+        const mathBirthday = $("#math-birthday");
+
+        const getNextMathBirthday = (birthDate) => {
+          const DAY_MS = 1000 * 60 * 60 * 24;
+          const birthTime = birthDate.getTime();
+          const now = Date.now();
+          let days = 1;
+          let time = birthTime;
+          while (time <= now) {
+            days *= 10;
+            time = birthTime + DAY_MS * days;
+          }
+          return { date: new Date(time), days };
+        };
+
+        const setBirthdate = (birthDate) => {
+          if (birthDate.getTime() > Date.now()) {
+            birthdate.text("Your birthdate should be a past date");
+            mathBirthday.text("");
+          } else {
+            const { date, days } = getNextMathBirthday(birthDate);
+            const daysOld = `${days}-day-old birthday`;
+            birthdate.text(
+              `Your birthdate is ${birthDate.toLocaleDateString()}`
+            );
+            mathBirthday.text(
+              `Your next math birthday is your\n${daysOld} on ${date.toLocaleDateString()}`
+            );
+          }
+        };
+
+        const picker = datePicker({ onChange: setBirthdate });
+        setBirthdate(new Date());
+
         pickerWrapper.append(picker);
       });
     </script>
