@@ -21,5 +21,105 @@
     </div>
     <script src="https://kit.fontawesome.com/f59a23bc6b.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>
+      const datePicker = () => {
+        const months = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ].map((el) => el.substring(0, 3));
+        const daysOfWeek = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ].map((el) => el.substring(0, 2));
+        const date = new Date();
+        date.setHours(0, 0, 0, 0);
+        const d = new Date(date);
+        let daysCount = 0;
+
+        const container = $("<div/>", {
+          class: "p-2",
+          css: { maxWidth: "300px" },
+        });
+        // Header
+        const divHeader = $("<div/>", {
+          class: "d-flex justify-content-between mb-1",
+        });
+        const btnPrev = $("<button/>", {
+          class: "btn btn-dark btn-sm fa-solid fa-chevron-left",
+        });
+        const btnNext = $("<button/>", {
+          class: "btn btn-dark btn-sm fa-solid fa-chevron-right",
+        });
+        const btnHeading = $("<button/>", {
+          class: "btn btn-dark btn-sm fw-bold",
+        });
+        // Days
+        const divDays = $("<div/>", {
+          class: "d-flex flex-wrap",
+        });
+        const txtDays = daysOfWeek.map((day) =>
+          $("<span/>", {
+            class: "px-2 py-1 small text-center",
+            css: { width: `${100 / 7}%` },
+            text: day,
+          })
+        );
+        const gapDays = $("<span/>");
+        const btnsDays = Array.from(Array(31), (_, day) =>
+          $("<button/>", {
+            class: "btn btn-dark btn-sm fw-bold",
+            css: { width: `${100 / 7}%` },
+            text: day + 1,
+          })
+        );
+
+        const updateMonth = () => {
+          const newCount = new Date(
+            d.getFullYear(),
+            d.getMonth() + 1,
+            0
+          ).getDate();
+          if (daysCount > newCount) {
+            btnsDays.slice(newCount, daysCount).forEach((el) => {
+              el.detach();
+            });
+          } else if (newCount > daysCount) {
+            divDays.append(btnsDays.slice(daysCount, newCount));
+          }
+          daysCount = newCount;
+          const offset = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
+          gapDays.css("width", `${(100 / 7) * offset}%`);
+          btnHeading.text(`${months[d.getMonth()]} ${d.getFullYear()}`);
+        };
+
+        divHeader.append(btnPrev, btnHeading, btnNext);
+        divDays.append(txtDays, gapDays);
+        container.append(divHeader, divDays);
+        updateMonth();
+        return container;
+      };
+    </script>
+    <script>
+      $(document).ready(() => {
+        const pickerWrapper = $("#datepicker");
+        const picker = datePicker();
+        pickerWrapper.append(picker);
+      });
+    </script>
   </body>
 </html>
